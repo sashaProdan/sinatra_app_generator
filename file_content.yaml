@@ -1,0 +1,47 @@
+root_dir_files: 
+  - application.rb:
+      - reguire 'sinatra'
+      - require 'sinatra/reloader' if development?
+      - require 'tilt/erubis'
+  - Gemfile:
+      - source 'https://rubygems.org'
+      - ruby '2.3.1'
+      - gem 'minitest'
+      - gem 'sinatra'
+      - gem 'sinatra-contrib'
+  - Procfile: |
+        web: bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development'
+  - config.ru:
+      - require './application'
+      - run Sinatra::Application
+
+sub_dirs: 
+  public: 
+    - images
+    - javascripts
+    - stylesheets
+  views: 
+    - index.erb
+  test:
+    - application_test.rb: |
+        ENV["RACK_ENV"] = "test"
+
+        require "minitest/autorun"
+        require "rack/test"
+
+        require_relative "../application"
+
+        class ApplicationTest < Minitest::test
+          include Rack::Test::Methods
+
+          def application
+            Sinatra::Application
+          end
+        end
+
+
+
+
+
+
+
