@@ -1,19 +1,26 @@
 require "psych"
 require "fileutils"
-
+require 'pry'
 
 class Directory
   DATA = Psych.load_file("file_content.yaml")
 
   def initialize(name)
-    @app_name = FileUtils::mkdir(name)
+    @name = name
   end
 
   def generate
-    FileUtils::cd(app_name.first)
+    create_new_app
+    FileUtils::cd(name)
 
     create_root_dir_files
-    create_sub_folders
+    create_root_dir_folders
+    generate_root_dir_files_content
+    generate_root_dir_folders_content
+  end
+
+  def create_new_app
+    FileUtils::mkdir(name)
   end
 
   def create_root_dir_files
@@ -22,23 +29,39 @@ class Directory
     end
   end
 
-  def create_sub_folders
+  def create_root_dir_folders
     DATA['sub_dirs'].keys.each { |folder| FileUtils::mkdir(folder) }
   end
 
   def generate_root_dir_files_content
+    data_files = DATA['root_dir_files']
+
+    data_files.each do |pair|
+      pair.each do |file, data|
+        if Dir.glob('*').include? file
+          current_file = existed_files.delete(file)
+
+          File::write(current_file, generate_content(data))
+        end
+      end
+    end
+  end
+
+  def generate_root_dir_folders_content
 
   end
 
-  def generate_sub_folders_content
-
+  def generate_content(data)
+    return data if data.class == String
+    data.join("\n")
   end
 
   private
 
-    attr_accessor :app_name
+    attr_reader :name
 end
 
-Directory.new('').generate
-
+#Directory.new('').generate
+x = Directory.new('haha')
+x.generate
 
