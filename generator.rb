@@ -34,12 +34,12 @@ class Directory
   end
 
   def generate_root_dir_files_content
-    data_files = DATA['root_dir_files']
+    stored_files = DATA['root_dir_files']
 
-    data_files.each do |pair|
+    stored_files.each do |pair|
       pair.each do |file, data|
         if Dir.glob('*').include? file
-          current_file = existed_files.delete(file)
+          current_file = stored_files.delete(file)
 
           File::write(current_file, generate_content(data))
         end
@@ -51,17 +51,16 @@ class Directory
 
   end
 
-  def generate_content(data)
-    return data if data.class == String
-    data.join("\n")
-  end
-
   private
 
     attr_reader :name
+
+    def generate_content(data)
+      return data if data.class == String
+      data.join("\n")
+    end
 end
 
-#Directory.new('').generate
-x = Directory.new('haha')
-x.generate
+Directory.new('').generate
+
 
